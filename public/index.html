@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+    <head>
+        <title>Mean Stack</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="./bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="./angular/angular.min.js"></script>
+        <script src="./angular/angular-route.min.js"></script>
+        <script>
+            var app=angular.module('app',['ngRoute']);
+
+    app.config(function($routeProvider){
+        $routeProvider.when('/',{
+            controller:"HomeController",
+            controllerAs:'vm',
+            templateUrl:'./home.html'
+        });
+        $routeProvider.otherwise('/');
+    });
+
+    app.controller('HomeController',['$http','$scope',function($http,$scope){
+        var vm=this;
+        vm.users=[];
+
+        vm.showDetails=function(user){
+            vm.detailedUser=user;
+            vm.details=true;
+        };
+
+        vm.title="Welcome";
+        vm.getUsers=function(){
+            $http.get('/api/users').then(function(response){
+                vm.users=response.data;
+            });
+        }
+        vm.getUsers();
+
+        vm.updateUser=function(user){
+            if(user){
+                $http.put('/api/users/'+user._id).then(function(res){
+                    vm.getUsers();
+                });
+            }
+        }
+
+        vm.removeUser=function(user){
+            if(user){
+                $http.delete('/api/users/'+user._id).then(function(res){
+                    vm.getUsers();
+                });
+            }
+        }
+
+        vm.addUser=function(user){
+            if(user){
+                $http.post('/api/users',user).then(function(response){
+                    vm.getUsers();
+                    vm.user='';
+                });
+            }
+        }
+    }]);
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div ng-view>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
